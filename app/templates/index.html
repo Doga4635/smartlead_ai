@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Callifex | Geleceğin Kariyerini Şekillendir</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .chat-box {
+            height: 320px;
+            overflow-y: auto;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .msg-user {
+            background: #4f46e5;
+            color: white;
+            border-radius: 12px 12px 0 12px;
+            padding: 8px 14px;
+            max-width: 80%;
+            margin-left: auto;
+        }
+        .msg-ai {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border-radius: 12px 12px 12px 0;
+            padding: 8px 14px;
+            max-width: 80%;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body class="py-4">
+
+<div class="container">
+    <!-- Top Nav / Z-Pattern Top Left -->
+    <header class="d-flex justify-content-between align-items-center mb-5">
+        <h2 class="fw-bold text-indigo"><span class="text-primary">Callifex</span> AI</h2>
+        <a href="/dashboard" class="btn btn-outline-light btn-sm">Yönetici Paneli</a>
+    </header>
+
+    <div class="row g-4 align-items-center">
+        <!-- Sol Bölüm: Slogan ve Sektör Kartları -->
+        <div class="col-md-5">
+            <h1 class="display-6 fw-bold mb-3">Yazılım, UI/UX ve Pazarlamada Kariyer Yol Haritanı Çiz</h1>
+            <p class="text-secondary mb-4">Kendi tempona uygun, uygulama odaklı eğitimlerle kariyer geçişini başlat. Yapay zekâ asistanımıza sorularını sor!</p>
+            
+            <div class="d-flex gap-2 mb-3">
+                <span class="badge bg-primary p-2">💻 Yazılım</span>
+                <span class="badge bg-info p-2 text-dark">🎨 UI/UX Tasarım</span>
+                <span class="badge bg-warning p-2 text-dark">📈 Dijital Pazarlama</span>
+            </div>
+        </div>
+
+        <!-- Sağ Bölüm: Sohbet ve Lead Formu (Glassmorphism) -->
+        <div class="col-md-7">
+            <div class="glass-card p-4">
+                <h5 class="mb-3">✨ Callifex Kariyer Asistanı</h5>
+                
+                <!-- Chat Log -->
+                <div id="chatBox" class="chat-box mb-3 d-flex flex-column gap-2 p-2">
+                    <div class="msg-ai">Merhaba! Ben Callifex Kariyer Danışmanıyım. Hangi alanda kendinizi geliştirmek istersiniz?</div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="input-group mb-4">
+                    <input type="text" id="userMsg" class="form-control bg-dark text-white border-secondary" placeholder="Sorunuzu buraya yazın...">
+                    <button class="btn btn-primary" id="btnSor" onclick="mesajGonder()">Sor</button>
+                </div>
+
+                <hr class="border-secondary my-4">
+
+                <!-- Lead Formu -->
+                <h6 class="mb-3 text-warning">📌 Size Özel Detaylı Yol Haritasını Alın</h6>
+                <form id="leadForm" onsubmit="leadKaydet(event)">
+                    <div class="row g-2">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" id="leadIsim" class="form-control bg-dark text-white border-secondary" placeholder="Ad Soyad *" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="tel" id="leadTelefon" class="form-control bg-dark text-white border-secondary" placeholder="Telefon *" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="email" id="leadEmail" class="form-control bg-dark text-white border-secondary" placeholder="E-Posta *" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" id="leadHedef" class="form-control bg-dark text-white border-secondary" placeholder="Kariyer Hedefiniz (Örn: UI/UX)">
+                        </div>
+                    </div>
+                    <button type="submit" id="btnKaydet" class="btn btn-success w-100 mt-2">Ücretsiz Yol Haritasını Gönder</button>
+                </form>
+                <div id="formStatus" class="mt-2 text-center small"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let sohbetGecmisi = [];
+
+async function mesajGonder() {
+    const input = document.getElementById('userMsg');
+    const msg = input.value.trim();
+    if(!msg) return;
+
+    const chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML += `<div class="msg-user">${msg}</div>`;
+    input.value = '';
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+        const res = await fetch('/api/sohbet', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ mesaj: msg, gecmis: sohbetGecmisi })
+        });
+        const data = await res.json();
+        
+        if(data.basari) {
+            chatBox.innerHTML += `<div class="msg-ai">${data.yanit}</div>`;
+            sohbetGecmisi.push({role: 'user', content: msg});
+            sohbetGecmisi.push({role: 'assistant', content: data.yanit});
+        } else {
+            chatBox.innerHTML += `<div class="msg-ai text-danger">${data.hata}</div>`;
+        }
+    } catch(e) {
+        chatBox.innerHTML += `<div class="msg-ai text-danger">Bağlantı hatası oluştu.</div>`;
+    }
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function leadKaydet(e) {
+    e.preventDefault();
+    const status = document.getElementById('formStatus');
+    status.className = 'mt-2 text-center small text-info';
+    status.innerText = 'Kaydediliyor...';
+
+    const payload = {
+        isim: document.getElementById('leadIsim').value,
+        telefon: document.getElementById('leadTelefon').value,
+        email: document.getElementById('leadEmail').value,
+        kariyer_hedefi: document.getElementById('leadHedef').value
+    };
+
+    try {
+        const res = await fetch('/api/leads', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if(data.basari) {
+            status.className = 'mt-2 text-center small text-success';
+            status.innerText = 'Tebrikler! Kariyer planınız e-posta adresinize gönderilecektir.';
+            document.getElementById('leadForm').reset();
+        } else {
+            status.className = 'mt-2 text-center small text-danger';
+            status.innerText = data.hata;
+        }
+    } catch(e) {
+        status.className = 'mt-2 text-center small text-danger';
+        status.innerText = 'Bir hata oluştu.';
+    }
+}
+</script>
+</body>
+</html>

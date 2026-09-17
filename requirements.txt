@@ -1,0 +1,5 @@
+Flask
+Requests
+Groq
+Dotenv
+Flask-Cors

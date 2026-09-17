@@ -1,0 +1,4 @@
+Name: Ali, Age: 20, Grade: 85
+Name: Ayşe, Age: 22, Grade: 90
+Name: Mehmet, Age: 19, Grade: 75
+Ali, 20, 85
