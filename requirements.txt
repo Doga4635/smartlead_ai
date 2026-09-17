@@ -3,3 +3,4 @@ Requests
 Groq
 Dotenv
 Flask-Cors
+gunicorn
