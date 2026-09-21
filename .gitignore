@@ -1,1 +1,11 @@
+# Ortam Değişkenleri
 .env
+
+# Sanal ortam
+venv/
+env/
+.venv/
+
+# Veritabanı
+*.db
+*.sqlite3
