@@ -7,5 +7,4 @@ env/
 .venv/
 
 # Veritabanı
-*.db
-*.sqlite3
+smartlead.db

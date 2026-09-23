@@ -55,13 +55,12 @@ def sohbet():
             'yanit': yanit
         }), 200
 
+    # app/routes.py içindeki sohbet fonksiyonu
     except AIServiceError as e:
-        # AI Servisi hatası durumunda 503 Service Unavailable
         return jsonify({
-            'basari': False,
-            'hata': "Şu anda yapay zekâ servisine ulaşılamıyor. Lütfen biraz sonra tekrar deneyin.",
-            'detay': str(e)
-        }), 503
+        'basari': False,
+        'hata': f"AI Servis Hatası: {str(e)}"  # Gerçek iç hatayı yanıta ekliyoruz
+    }), 503
 
     except Exception as e:
         return jsonify({

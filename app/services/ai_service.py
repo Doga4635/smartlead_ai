@@ -29,7 +29,7 @@ class AIService:
         api_key = self.config.GROQ_API_KEY
 
         # Anahtar yoksa veya tanımlanmamışsa demo modunda çalışır
-        if not api_key or api_key.strip() == "" or api_key == "gsk_your_actual_groq_api_key_here":
+        if not api_key or api_key.strip() == "" or api_key == self.config.GROQ_API_KEY:
             return (
                 "[DEMO MODU] Merhaba! Ben Callifex kariyer danışmanıyım. "
                 "Şu an API anahtarı tanımlı olmadığı için demo modunda yanıt veriyorum. "
