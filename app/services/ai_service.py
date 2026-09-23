@@ -10,7 +10,7 @@ class AIService:
     def __init__(self):
         self.config = get_config()
         # Aktif ve çalışan resmi Groq modeli
-        self.model = "llama-3.3-70b-versatile"  
+        self.model = "qwen/qwen3.6-27b"
         self.groq_url = "https://api.groq.com/openai/v1/chat/completions"
 
     def _get_system_prompt(self):
