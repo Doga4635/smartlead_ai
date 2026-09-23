@@ -9,8 +9,8 @@ class AIService:
 
     def __init__(self):
         self.config = get_config()
-        # Aktif ve resmi Groq modeli
-        self.model = "llama-3.1-8b-instant"  
+        # Aktif ve çalışan resmi Groq modeli
+        self.model = "llama-3.3-70b-versatile"  
         self.groq_url = "https://api.groq.com/openai/v1/chat/completions"
 
     def _get_system_prompt(self):
@@ -24,7 +24,7 @@ class AIService:
         """
         api_key = self.config.GROQ_API_KEY
 
-        # DÜZELTİLDİ: Sadece anahtar yoksa, boşsa veya yer tutucu (default) ise demo moduna geçer
+        # Sadece anahtar tanımlı değilse veya varsayılan değerdeyse demo moduna geçer
         if not api_key or api_key.strip() == "" or api_key == "gsk_your_actual_groq_api_key_here":
             return (
                 "[DEMO MODU] Merhaba! Ben Callifex kariyer danışmanıyım. "
@@ -86,5 +86,5 @@ class AIService:
         except (KeyError, IndexError) as e:
             raise AIServiceError(f"API yanıtı beklenmeyen bir formatta geldi: {str(e)}")
 
-# Dosya sonunda tek bir servis örneği (Singleton pattern)
+# Singleton Örneği
 ai_service = AIService()
