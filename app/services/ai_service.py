@@ -9,8 +9,8 @@ class AIService:
 
     def __init__(self):
         self.config = get_config()
-        # Aktif ve güncel Groq modeli
-        self.model = "qwen/qwen3.6-27b"  
+        # Aktif ve resmi Groq modeli
+        self.model = "llama-3.1-8b-instant"  
         self.groq_url = "https://api.groq.com/openai/v1/chat/completions"
 
     def _get_system_prompt(self):
@@ -21,15 +21,11 @@ class AIService:
         """
         Kullanıcı mesajını ve sohbet geçmişini alarak Groq API'sine gönderir, 
         üretilen yanıtı döndürür.
-        
-        :param mesaj: Kullanıcının son gönderdiği mesaj (str)
-        :param gecmis: Önceki mesajların listesi [{'role': 'user'/'assistant', 'content': '...'}]
-        :return: Yapay zekânın ürettiği yanıt (str)
         """
         api_key = self.config.GROQ_API_KEY
 
-        # Anahtar yoksa veya tanımlanmamışsa demo modunda çalışır
-        if not api_key or api_key.strip() == "" or api_key == self.config.GROQ_API_KEY:
+        # DÜZELTİLDİ: Sadece anahtar yoksa, boşsa veya yer tutucu (default) ise demo moduna geçer
+        if not api_key or api_key.strip() == "" or api_key == "gsk_your_actual_groq_api_key_here":
             return (
                 "[DEMO MODU] Merhaba! Ben Callifex kariyer danışmanıyım. "
                 "Şu an API anahtarı tanımlı olmadığı için demo modunda yanıt veriyorum. "
@@ -56,7 +52,7 @@ class AIService:
         messages.append({"role": "user", "content": mesaj})
 
         headers = {
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": f"Bearer {api_key.strip()}",
             "Content-Type": "application/json"
         }
 
