@@ -27,7 +27,7 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     """Üretim (Canlı) ortamı ayarları."""
     DEBUG = False
-    # Canlı ortamda SECRET_KEY varsayılan kalmasın uyarısı/kontrolü eklenebilir
+    
 
 # Ortam seçimi için sözlük yapısı
 config_by_name = {

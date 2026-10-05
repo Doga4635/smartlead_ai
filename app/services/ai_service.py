@@ -9,7 +9,6 @@ class AIService:
 
     def __init__(self):
         self.config = get_config()
-        # Groq üzerinde %100 aktif ve erişilebilir model ID'si
         self.model = "openai/gpt-oss-20b"  
         self.groq_url = "https://api.groq.com/openai/v1/chat/completions"
 

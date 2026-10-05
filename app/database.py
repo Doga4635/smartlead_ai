@@ -7,7 +7,6 @@ def get_db():
     erişebilmek için row_factory ayarını yapar.
     """
     config = get_config()
-    # SQLite URL formatı: sqlite:///smartlead.db -> dosya adını ayıklıyoruz
     db_path = config.DATABASE_URL.replace('sqlite:///', '')
     
     conn = sqlite3.connect(db_path)
