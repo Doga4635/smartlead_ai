@@ -59,15 +59,11 @@ python run.py
 ```
 Uygulama varsayılan olarak http://127.0.0.1:5000 adresinde çalışacaktır.
 
-🔌 API Endpoint'leri
+
+## 🔌 API Endpoint'leri
 ✅ POST /api/leads -> Yeni lead (iletişim bilgisi) kaydeder.
 
 ✅ POST /api/sohbet -> Kullanıcı mesajını alır, sohbet geçmişiyle birlikte AI servisine gönderir ve yanıt döner.
 
 ✅ GET /dashboard -> Kayıtlı lead listesini gösteren yönetim panelidir.
-
-
-
-
-
 
