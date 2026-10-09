@@ -41,6 +41,20 @@
             max-width: 80%;
             margin-right: auto;
         }
+        /* Custom Placeholder Rengi */
+        .placeholder-light::placeholder {
+            color: rgba(255, 255, 255, 0.75) !important; /* İsteğe göre #ffffff de yapabilirsiniz */
+            opacity: 1 !important; /* Opaklığı tam yaparak görünür kılma */
+        }
+
+        /* Internet Explorer ve Edge İçin Uyumluluk */
+        .placeholder-light:-ms-input-placeholder {
+            color: rgba(255, 255, 255, 0.75) !important;
+        }
+
+        .placeholder-light::-ms-input-placeholder {
+            color: rgba(255, 255, 255, 0.75) !important;
+        }
     </style>
 </head>
 <body class="py-4">
@@ -77,7 +91,7 @@
 
                 <!-- Chat Input -->
                 <div class="input-group mb-4">
-                    <input type="text" id="userMsg" class="form-control bg-dark text-white border-secondary" placeholder="Sorunuzu buraya yazın...">
+                    <input type="text" id="userMsg" class="form-control bg-dark text-white border-secondary placeholder-light" placeholder="Sorunuzu buraya yazın...">
                     <button class="btn btn-primary" id="btnSor" onclick="mesajGonder()">Sor</button>
                 </div>
 
@@ -86,20 +100,49 @@
                 <!-- Lead Formu -->
                 <h6 class="mb-3 text-warning">📌 Size Özel Detaylı Yol Haritasını Alın</h6>
                 <form id="leadForm" onsubmit="leadKaydet(event)">
-                    <div class="row g-2">
-                        <div class="col-md-6 mb-2">
-                            <input type="text" id="leadIsim" class="form-control bg-dark text-white border-secondary" placeholder="Ad Soyad *" required>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <input type="tel" id="leadTelefon" class="form-control bg-dark text-white border-secondary" placeholder="Telefon *" required>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <input type="email" id="leadEmail" class="form-control bg-dark text-white border-secondary" placeholder="E-Posta *" required>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <input type="text" id="leadHedef" class="form-control bg-dark text-white border-secondary" placeholder="Kariyer Hedefiniz (Örn: UI/UX)">
+                    <div class="row g-3">
+                    <!-- Sol Taraf: 6 Adet Input Alanı (2 Sütunlu Grid) -->
+                    <div class="col-lg-8">
+                        <div class="row g-3">
+                            <!-- Ad Soyad -->
+                            <div class="col-md-6">
+                                <label for="leadIsim" class="form-label text-white fw-medium">Ad Soyad *</label>
+                                <input type="text" id="leadIsim" class="form-control bg-dark text-white border-secondary placeholder-light" placeholder="Ad Soyad *" required>
+                            </div>
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label for="leadEmail" class="form-label text-white fw-medium">Email *</label>
+                                <input type="email" id="leadEmail" class="form-control bg-dark text-white border-secondary placeholder-light" placeholder="E-Posta *" required>
+                            </div>
+                            <!-- Telefon Numarası -->
+                            <div class="col-md-6">
+                                <label for="leadTelefon" class="form-label text-white fw-medium">Telefon Numarası *</label>
+                                <input type="tel" id="leadTelefon" class="form-control bg-dark text-white border-secondary placeholder-light" placeholder="Telefon *" required>
+                            </div>
+                            <!-- Kariyer Hedefi -->
+                            <div class="col-md-6">
+                                <label for="leadHedef" class="form-label text-white fw-medium">Kariyer Hedefi</label>
+                                <input type="text" id="leadHedef" class="form-control bg-dark text-white border-secondary placeholder-light" placeholder="Kariyer Hedefiniz (Örn: UI/UX)">
+                            </div>
+                            <!-- Meslek -->
+                            <div class="col-md-6">
+                                <label for="leadMeslek" class="form-label text-white fw-medium">Meslek</label>
+                                <input type="text" id="leadMeslek" class="form-control bg-dark text-white border-secondary placeholder-light" placeholder="Mesleğiniz">
+                            </div>
+                            <!-- Haftalık Ayırabileceğiniz Zaman -->
+                            <div class="col-md-6">
+                                <label for="leadZaman" class="form-label text-white fw-medium">Haftalık Ayırabileceğiniz Zaman</label>
+                                <input type="text" id="leadZaman" class="form-control bg-dark text-white border-secondary placeholder-light" placeholder="Örn: 10 Saat">
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Sağ Taraf: Büyük Mesaj Alanı -->
+                    <div class="col-lg-4 d-flex flex-column">
+                        <label for="leadMesaj" class="form-label text-white fw-medium">Mesaj</label>
+                        <textarea id="leadMesaj" class="form-control bg-dark text-white border-secondary placeholder-light flex-grow-1" style="min-height: 200px; resize: none;" placeholder="Mesajınızı yazınız..."></textarea>
+                    </div>
+                </div>
                     <button type="submit" id="btnKaydet" class="btn btn-success w-100 mt-2">Ücretsiz Yol Haritasını Gönder</button>
                 </form>
                 <div id="formStatus" class="mt-2 text-center small"></div>
@@ -152,6 +195,7 @@ async function leadKaydet(e) {
         isim: document.getElementById('leadIsim').value,
         telefon: document.getElementById('leadTelefon').value,
         email: document.getElementById('leadEmail').value,
+        meslek: document.getElementById('leadMeslek').value,
         kariyer_hedefi: document.getElementById('leadHedef').value
     };
 
