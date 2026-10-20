@@ -12,6 +12,7 @@ class Config:
     # AI Yapılandırması
     GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
     AI_PROVIDER = os.environ.get('AI_PROVIDER', 'groq')
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "varsayilan_admin_sifre") # Admin şifresi
     BUSINESS_CONTEXT = os.environ.get(
         'BUSINESS_CONTEXT',
         'Sen bir yapay zekâ asistanısın. Ziyaretçilere yardımcı ol ve iletişim bilgilerini topla.'

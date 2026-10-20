@@ -3,67 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Callifex Admin | Müşteri Adayları (Leads)</title>
+    <title>Callifex Admin | Müşteri Adayları</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #0f172a; color: #f8fafc; }
-        .table-dark { background-color: #1e293b; }
     </style>
 </head>
-<body class="container py-4">
+<body class="container py-5">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>📊 Callifex Lead Yönetim Paneli</h2>
-        <a href="/" class="btn btn-outline-primary">Karşılama Sayfasına Dön</a>
+    <!-- ŞİFRE GİRİŞ EKRANI -->
+    <div id="authBox" class="card bg-dark text-white border-secondary mx-auto" style="max-width: 400px;">
+        <div class="card-body text-center p-4">
+            <h4 class="mb-3">🔐 Admin Girişi</h4>
+            <p class="text-secondary small">Yönetim paneline erişmek için admin şifrenizi girin.</p>
+            <input type="password" id="adminPassInput" class="form-control bg-dark text-white border-secondary mb-3" placeholder="Şifre...">
+            <button onclick="girisYap()" class="btn btn-primary w-100">Giriş Yap</button>
+            <div id="authError" class="text-danger mt-2 small"></div>
+        </div>
     </div>
 
-    <div class="card bg-dark text-white border-secondary">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle mb-0">
-                    <thead>
-                        <tr class="text-primary">
-                            <th>İsim (F-Pattern Sol)</th>
-                            <th>Telefon</th>
-                            <th>E-Posta</th>
-                            <th>Kariyer Hedefi</th>
-                            <th>Tarih</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leadTableBody">
-                        <tr><td colspan="5" class="text-center">Kayıtlar yükleniyor...</td></tr>
-                    </tbody>
-                </table>
+    <!-- YÖNETİM PANELİ İÇERİĞİ (Giriş yapılmadan gizlidir) -->
+    <div id="dashboardContent" class="d-none">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>📊 Callifex Lead Yönetim Paneli</h2>
+            <a href="/" class="btn btn-outline-primary">Karşılama Sayfasına Dön</a>
+        </div>
+
+        <div class="card bg-dark text-white border-secondary">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0">
+                        <thead>
+                            <tr class="text-primary">
+                                <th>İsim</th>
+                                <th>Telefon</th>
+                                <th>E-Posta</th>
+                                <th>Kariyer Hedefi</th>
+                                <th>Tarih</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
 <script>
-async function leadsYukle() {
-    try {
-        const res = await fetch('/api/leads');
-        const data = await res.json();
-        const tbody = document.getElementById('leadTableBody');
+async function girisYap() {
+    const sifre = document.getElementById('adminPassInput').value;
+    const errDiv = document.getElementById('authError');
+    errDiv.innerText = '';
 
-        if(data.basari && data.veri.length > 0) {
-            tbody.innerHTML = data.veri.map(item => `
-                <tr>
-                    <td class="fw-bold">${item.isim}</td>
-                    <td>${item.telefon}</td>
-                    <td>${item.email}</td>
-                    <td><span class="badge bg-secondary">${item.kariyer_hedefi || '-'}</span></td>
-                    <td class="small text-muted">${item.tarih}</td>
-                </tr>
-            `).join('');
+    if (!sifre) {
+        errDiv.innerText = 'Lütfen şifre giriniz.';
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/leads', {
+            method: 'GET',
+            headers: {
+                'X-Admin-Password': sifre
+            }
+        });
+
+        const data = await res.json();
+
+        if (res.status === 200 && data.basari) {
+            // Şifre doğru, giriş kutusunu gizle ve tabloyu göster
+            document.getElementById('authBox').classList.add('d-none');
+            document.getElementById('dashboardContent').classList.remove('d-none');
+
+            // Tabloyu doldur
+            const tbody = document.getElementById('leadTableBody');
+            if (data.veri.length > 0) {
+                tbody.innerHTML = data.veri.map(item => `
+                    <tr>
+                        <td class="fw-bold">${item.isim}</td>
+                        <td>${item.telefon}</td>
+                        <td>${item.email}</td>
+                        <td><span class="badge bg-secondary">${item.kariyer_hedefi || '-'}</span></td>
+                        <td class="small text-muted">${item.tarih}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Henüz kayıtlı lead bulunmuyor.</td></tr>';
+            }
         } else {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Henüz kayıtlı lead bulunmuyor.</td></tr>';
+            errDiv.innerText = data.hata || 'Hatalı şifre!';
         }
-    } catch(e) {
-        document.getElementById('leadTableBody').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Veriler yüklenirken hata oluştu.</td></tr>';
+    } catch (e) {
+        errDiv.innerText = 'Bağlantı hatası oluştu.';
     }
 }
-
-leadsYukle();
 </script>
 </body>
 </html>

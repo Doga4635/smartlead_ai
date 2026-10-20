@@ -1,13 +1,12 @@
 from flask import Blueprint, render_template, request, jsonify
-
-# app/ database.py içinden
 from app.database import lead_ekle, tum_leadler
-
-# app/services/ai_service.py içinden
 from app.services.ai_service import ai_service, AIServiceError
+from config import get_config
 
 pages_bp = Blueprint('pages', __name__)
 api_bp = Blueprint('api', __name__, url_prefix='/api')
+
+config = get_config()
 
 
 # ==========================================
@@ -122,19 +121,25 @@ def yeni_lead():
 
 
 @api_bp.route('/leads', methods=['GET'])
-def lead_listesi():
-    """Tüm lead kayıtlarını veritabanından çekip liste olarak döndürür."""
+def leads_listele():
+    # Header'dan şifreyi kontrol et
+    gelen_sifre = request.headers.get('X-Admin-Password')
+    
+    if not gelen_sifre or gelen_sifre != config.ADMIN_PASSWORD:
+        return jsonify({
+            'basari': False,
+            'hata': 'Yetkisiz erişim! Geçersiz admin şifresi.'
+        }), 401
+    
     try:
-        # Veritabanı Katmanına Yönlendirme
-        leads = tum_leadler()
+        veriler = tum_leadler()
         return jsonify({
             'basari': True,
-            'veri': leads,
-            'toplam': len(leads)
+            'toplam': len(veriler),
+            'veri': veriler
         }), 200
-
     except Exception as e:
         return jsonify({
             'basari': False,
-            'hata': "Kayıtlar çekilirken bir hata oluştu."
+            'hata': 'Veriler çekilirken bir hata oluştu.'
         }), 500
