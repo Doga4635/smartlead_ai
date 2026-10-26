@@ -22,6 +22,7 @@ def index():
 @pages_bp.route('/dashboard', methods=['GET'])
 def dashboard():
     """İşletme sahibinin kayıtlı lead'leri gördüğü yönetim paneli."""
+    # Lead verileri bu sayfada değil, panelin çağırdığı korumalı API üzerinden yüklenir.
     return render_template('dashboard.html')
 
 
@@ -36,6 +37,7 @@ def sohbet():
     Örnek Body: {"mesaj": "Merhaba", "gecmis": [...]}
     """
     data = request.get_json() or {}
+    # Mesaj geçmişi isteğe bağlıdır; servis yeni sohbeti boş geçmişle başlatabilir.
     mesaj = data.get('mesaj')
     gecmis = data.get('gecmis', [])
 
@@ -56,12 +58,14 @@ def sohbet():
 
     # app/routes.py içindeki sohbet fonksiyonu
     except AIServiceError as e:
+        # Dış AI sağlayıcısına özgü hatalar geçici servis kullanılamıyor yanıtına çevrilir.
         return jsonify({
         'basari': False,
         'hata': f"AI Servis Hatası: {str(e)}"  # Gerçek iç hatayı yanıta ekliyoruz
     }), 503
 
     except Exception as e:
+        # Beklenmeyen dahili hataların ayrıntılarını istemciye sızdırmadan genel hata döndürür.
         return jsonify({
             'basari': False,
             'hata': "Sunucu tarafında beklenmeyen bir hata oluştu."
@@ -84,6 +88,7 @@ def yeni_lead():
     """
     data = request.get_json() or {}
     
+    # Kayıt oluşturulmadan önce API sözleşmesindeki zorunlu iletişim alanlarını doğrular.
     isim = data.get('isim')
     telefon = data.get('telefon')
     email = data.get('email')
@@ -114,6 +119,7 @@ def yeni_lead():
         }), 201
 
     except Exception as e:
+        # Veritabanı/işlem hatalarında kayıt başarılıymış gibi yanıt vermemek için 500 döner.
         return jsonify({
             'basari': False,
             'hata': "Lead kaydı oluşturulurken bir hata oluştu."
@@ -122,7 +128,7 @@ def yeni_lead():
 
 @api_bp.route('/leads', methods=['GET'])
 def leads_listele():
-    # Header'dan şifreyi kontrol et
+    # Panelin gönderdiği yönetici parolasını veritabanı sorgusundan önce doğrular.
     gelen_sifre = request.headers.get('X-Admin-Password')
     
     if not gelen_sifre or gelen_sifre != config.ADMIN_PASSWORD:
@@ -132,6 +138,7 @@ def leads_listele():
         }), 401
     
     try:
+        # Yetkilendirme başarılıysa kayıtları alıp toplam sayısıyla birlikte JSON olarak döndürür.
         veriler = tum_leadler()
         return jsonify({
             'basari': True,

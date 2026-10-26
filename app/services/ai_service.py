@@ -8,6 +8,7 @@ class AIServiceError(Exception):
 class AIService:
 
     def __init__(self):
+        # Sağlayıcı ayarlarını tek yerde tutar; API çağrısı aşağıdaki Groq uyumlu endpoint'e gider.
         self.config = get_config()
         self.model = "openai/gpt-oss-20b"  
         self.groq_url = "https://api.groq.com/openai/v1/chat/completions"
@@ -36,11 +37,13 @@ class AIService:
             gecmis = []
 
         # 1. İstek dizisini (messages) hazırlama
+        # Sistem mesajı asistanın işletme bağlamını ve yanıt rolünü belirler.
         messages = [
             {"role": "system", "content": self._get_system_prompt()}
         ]
 
         # 2. Geçmiş sohbet mesajlarını ekleme
+        # Önceki turlar mevcut sıralarıyla eklenir; böylece model konuşma bağlamını görebilir.
         for node in gecmis:
             messages.append({
                 "role": node.get("role", "user"),
@@ -48,6 +51,7 @@ class AIService:
             })
 
         # 3. Son kullanıcı mesajını ekleme
+        # Yeni mesaj geçmişten ayrı eklenir; arayüzün gönderdiği geçmişe tekrar yazılmaz.
         messages.append({"role": "user", "content": mesaj})
 
         headers = {
@@ -63,6 +67,7 @@ class AIService:
 
         # 4. API İsteği ve Hata Yönetimi
         try:
+            # Zaman aşımı sınırı, sağlayıcının yanıt vermemesi halinde isteğin sonsuza dek beklemesini önler.
             response = requests.post(
                 self.groq_url,
                 json=payload,
@@ -71,11 +76,13 @@ class AIService:
             )
 
             if response.status_code != 200:
+                # Sağlayıcı başarısız HTTP kodu döndürdüyse yanıt içeriğini servis hatasına ekler.
                 raise AIServiceError(
                     f"Groq API hatası döndürdü (Status {response.status_code}): {response.text}"
                 )
 
             data = response.json()
+            # OpenAI uyumlu yanıt yapısındaki ilk seçeneğin metin içeriğini döndürür.
             return data["choices"][0]["message"]["content"]
 
         except requests.exceptions.Timeout:
@@ -85,5 +92,5 @@ class AIService:
         except (KeyError, IndexError) as e:
             raise AIServiceError(f"API yanıtı beklenmeyen bir formatta geldi: {str(e)}")
 
-# Singleton Örneği
+# İstekler arasında yeniden kullanılacak servis nesnesi; rotalar bu örneği içe aktarır.
 ai_service = AIService()

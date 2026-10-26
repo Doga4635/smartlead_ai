@@ -51,6 +51,7 @@
 
 <script>
 async function girisYap() {
+    // Parola yalnızca API isteğinin başlığında gönderilir; sayfa içinde oturum olarak saklanmaz.
     const sifre = document.getElementById('adminPassInput').value;
     const errDiv = document.getElementById('authError');
     errDiv.innerText = '';
@@ -61,6 +62,7 @@ async function girisYap() {
     }
 
     try {
+        // API hem parolayı doğrular hem de yetkiliyse lead listesini tek yanıtla verir.
         const res = await fetch('/api/leads', {
             method: 'GET',
             headers: {
@@ -77,6 +79,7 @@ async function girisYap() {
 
             // Tabloyu doldur
             const tbody = document.getElementById('leadTableBody');
+            // Liste boş olduğunda tablo gövdesine bilgilendirme satırı koyar.
             if (data.veri.length > 0) {
                 tbody.innerHTML = data.veri.map(item => `
                     <tr>

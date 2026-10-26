@@ -1,11 +1,12 @@
 import os
 from dotenv import load_dotenv
 
-# .env dosyasındaki değişkenleri os.environ içerisine yükler
+# Yerel geliştirme ayarlarının da ortam değişkenleri gibi okunabilmesi için .env dosyasını yükler.
 load_dotenv()
 
 class Config:
     """Temel yapılandırma sınıfı."""
+    # Ortam değişkenleri varsa önceliklidir; yoksa yerel geliştirme varsayılanları kullanılır.
     SECRET_KEY = os.environ.get('SECRET_KEY', 'default-dev-secret-key')
     DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///smartlead.db')
     
@@ -20,24 +21,15 @@ class Config:
     
     # Güvenlik ve Ağ
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*')
-
-class DevelopmentConfig(Config):
-    """Geliştirme ortamı ayarları."""
-    DEBUG = True
-
-class ProductionConfig(Config):
-    """Üretim (Canlı) ortamı ayarları."""
-    DEBUG = False
     
 
-# Ortam seçimi için sözlük yapısı
+# FLASK_ENV değerlerini yapılandırma sınıflarına eşler; tanınmayan değerler Config'e düşer.
 config_by_name = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'default': DevelopmentConfig
+    'default': Config
 }
 
 def get_config():
     """FLASK_ENV değişkenine göre ilgili config sınıfını döndürür."""
+    # Ortam belirtilmemişse veya eşleşen bir sınıf yoksa temel yapılandırma kullanılır.
     env = os.environ.get('FLASK_ENV', 'default')
-    return config_by_name.get(env, DevelopmentConfig)
+    return config_by_name.get(env, Config)

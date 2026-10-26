@@ -7,6 +7,7 @@ def get_db():
     erişebilmek için row_factory ayarını yapar.
     """
     config = get_config()
+    # SQLite URL'sindeki şema önekini kaldırıp sqlite3'ün beklediği dosya yolunu elde eder.
     db_path = config.DATABASE_URL.replace('sqlite:///', '')
     
     conn = sqlite3.connect(db_path)
@@ -21,6 +22,7 @@ def init_db(app=None):
     conn = get_db()
     cursor = conn.cursor()
     
+    # Uygulama ilk kez çalıştırıldığında tabloyu kurar; mevcut kayıtları değiştirmez.
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS leads (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,12 +48,14 @@ def lead_ekle(isim, telefon, email, meslek=None, kariyer_hedefi=None, haftalik_z
     conn = get_db()
     cursor = conn.cursor()
     
+    # Değerleri sorgu metninden ayrı göndererek kullanıcı girdilerinin SQL olarak yorumlanmasını önler.
     query = '''
         INSERT INTO leads (isim, telefon, email, meslek, kariyer_hedefi, haftalik_zaman, mesaj)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     '''
     
     cursor.execute(query, (isim, telefon, email, meslek, kariyer_hedefi, haftalik_zaman, mesaj))
+    # INSERT işlemini kalıcılaştırıp yeni kaydın kimliğini çağırana döndürür.
     conn.commit()
     
     new_id = cursor.lastrowid
@@ -67,6 +71,7 @@ def tum_leadler():
     conn = get_db()
     cursor = conn.cursor()
     
+    # Yönetim panelinin ihtiyaç duyduğu alanları en yeni kayıt en üstte olacak şekilde seçer.
     query = '''
         SELECT id, isim, telefon, email, meslek, kariyer_hedefi, haftalik_zaman, mesaj, tarih
         FROM leads

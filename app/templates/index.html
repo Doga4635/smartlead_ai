@@ -152,19 +152,23 @@
 </div>
 
 <script>
+// Başarılı yanıtları konuşma geçmişinde tutarak sonraki isteklere bağlam sağlar.
 let sohbetGecmisi = [];
 
 async function mesajGonder() {
     const input = document.getElementById('userMsg');
     const msg = input.value.trim();
+    // Boş mesajlar API'ye gönderilmez.
     if(!msg) return;
 
     const chatBox = document.getElementById('chatBox');
+    // Kullanıcı mesajını hemen gösterip alanı temizler; asistan yanıtı geldikten sonra geçmişe ekler.
     chatBox.innerHTML += `<div class="msg-user">${msg}</div>`;
     input.value = '';
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
+        // Yeni mesajı ve önceki başarılı turları sohbet endpoint'ine JSON olarak gönderir.
         const res = await fetch('/api/sohbet', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -174,6 +178,7 @@ async function mesajGonder() {
         
         if(data.basari) {
             chatBox.innerHTML += `<div class="msg-ai">${data.yanit}</div>`;
+            // Yalnızca başarılı turları saklar; böylece başarısız yanıtlar sonraki bağlamı kirletmez.
             sohbetGecmisi.push({role: 'user', content: msg});
             sohbetGecmisi.push({role: 'assistant', content: data.yanit});
         } else {
@@ -186,11 +191,13 @@ async function mesajGonder() {
 }
 
 async function leadKaydet(e) {
+    // Formun tarayıcı varsayılanı olan sayfa yenilemesini engelleyip kaydı arka planda yapar.
     e.preventDefault();
     const status = document.getElementById('formStatus');
     status.className = 'mt-2 text-center small text-info';
     status.innerText = 'Kaydediliyor...';
 
+    // Form alanlarını API'nin beklediği Türkçe anahtarlarla bir istek nesnesinde toplar.
     const payload = {
         isim: document.getElementById('leadIsim').value,
         telefon: document.getElementById('leadTelefon').value,
@@ -200,6 +207,7 @@ async function leadKaydet(e) {
     };
 
     try {
+        // İletişim bilgilerini kayıt endpoint'ine gönderir; isteğin sonucu kullanıcıya form altında gösterilir.
         const res = await fetch('/api/leads', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
